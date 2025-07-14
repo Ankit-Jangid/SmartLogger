@@ -7,6 +7,7 @@ import com.logger.storage.LogEvent
 import com.logger.worker.LogUploadWorker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
 /**
@@ -14,13 +15,21 @@ import kotlinx.coroutines.launch
  * The host app initialise and calls the logEvent to process events.
  * init method must be called before logging events else it will throw exception.
  * */
+
+//Better design approach have several benefits:
+//1.Saves resources (single scope) and avoiding multiple scope every time
+//2.Structured concurrency, better control over child jobs.
+//3.all are run under a managed job hierarchy
+private object LoggerScope : CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
 class SmartLogger private constructor(private val repository: LoggerRepository) {
 
     fun logEvent(eventName: String, payload: Map<String, Any>) {
-        CoroutineScope(Dispatchers.IO).launch {
+        LoggerScope.launch(Dispatchers.IO) {
             repository.logEvent(LogEvent(eventName, payload))
         }
     }
+
 
     companion object {
         @Volatile
