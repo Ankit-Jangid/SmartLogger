@@ -1,0 +1,44 @@
+@startuml
+skinparam style strictuml
+
+class SmartLogger {
+    - repository: LoggerRepository
+    + logEvent(name, payload)
+    + init(application, serverUrl)
+    + get(): SmartLogger
+}
+
+class LoggerRepository {
+    - db: LogDatabase
+    - dispatcher: EventDispatcher
+    + logEvent(event: LogEvent)
+}
+
+class LogEvent {
+    + name: String
+    + data: Map
+    + timestamp: Long
+    + id: String
+}
+
+class EventDispatcher {
+    + tryDispatch()
+}
+
+class LogUploadWorker {
+    + scheduleLogUpload(context)
+}
+
+class SmartLoggerConfig {
+    + serverUrl: String
+}
+
+SmartLogger --> LoggerRepository
+LoggerRepository --> LogDatabase : stores event in db
+LoggerRepository --> EventDispatcher
+SmartLogger ..> LogUploadWorker : schedules
+SmartLogger ..> SmartLoggerConfig : configures
+LoggerRepository --> LogEvent : creates entry
+EventDispatcher --> LogEvent : fetches logEvents and upload to server
+
+@enduml
