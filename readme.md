@@ -1,8 +1,8 @@
 
 SmartLogger application, and library (smartlogger)
 -
- - Application includes the library smartlogger and starts logging events by:
-   Step 1) SmartLogger.init(this, "your_server_url") //resides in application class to initialize library.
+ - Application includes the library smartlogger and starts logging events by: </br>
+   Step 1) SmartLogger.init(this, "your_server_url") //resides in application class to initialize library. </br>
    Step 2)  SmartLogger.get().logEvent(eventName, payload) //logs the event with map object payload.
 - The logging events are thread safe so the host app can call logEvent from any thread.
 - Logging process will be carried out internally on worker threads.
